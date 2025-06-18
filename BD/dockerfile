@@ -1,0 +1,10 @@
+FROM postgres:16
+
+
+ENV POSTGRES_USER=admin
+ENV POSTGRES_PASSWORD=admin
+ENV POSTGRES_DB=primeEdu
+
+COPY db_primeEdu.sql /docker-entrypoint-initdb.d/
+
+EXPOSE 5432
