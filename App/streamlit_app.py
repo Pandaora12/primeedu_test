@@ -4,13 +4,13 @@ import pandas as pd
 from datetime import datetime
 
 # Configuração da API
-API_URL = "http://localhost:5000"
+API_URL = "http://api:5000"
 token = None
 
 # Função para fazer login
-def login(email, senha):
+def login(login_user, senha):
     try:
-        response = requests.post(f"{API_URL}/login", json={"email": email, "senha": senha})
+        response = requests.post(f"{API_URL}/login", json={"login": login_user, "senha": senha})
         if response.status_code == 200:
             data = response.json()
             return data["token"], data["usuario"]
@@ -23,14 +23,14 @@ def login(email, senha):
 def login_page():
     st.title("Sistema de Gerenciamento Escolar")
     
-    email = st.text_input("Email")
+    login_input = st.text_input("Login")
     senha = st.text_input("Senha", type="password")
     
     col1, col2 = st.columns(2)
     
     with col1:
         if st.button("Login"):
-            token, usuario = login(email, senha)
+            token, usuario = login(login_input, senha)
             if token:
                 st.session_state["token"] = token
                 st.session_state["usuario"] = usuario
@@ -48,11 +48,10 @@ def login_page():
 def register_page():
     st.title("Registro de Novo Usuário")
     
-    nome = st.text_input("Nome Completo")
-    email = st.text_input("Email")
+    login_input = st.text_input("Login")
     senha = st.text_input("Senha", type="password")
     confirmar_senha = st.text_input("Confirmar Senha", type="password")
-    tipo = st.selectbox("Tipo de Usuário", ["admin", "secretaria", "professor"])
+    nivel_acesso = st.selectbox("Nível de Acesso", ["admin", "secretaria", "professor"])
     
     if st.button("Registrar"):
         if senha != confirmar_senha:
@@ -60,11 +59,10 @@ def register_page():
             return
             
         try:
-            response = requests.post(f"{API_URL}/registrar", json={
-                "nome": nome,
-                "email": email,
+            response = requests.post(f"{API_URL}/register", json={
+                "login": login_input,
                 "senha": senha,
-                "tipo": tipo
+                "nivel_acesso": nivel_acesso
             })
             
             if response.status_code == 201:
@@ -190,8 +188,8 @@ def turmas_page():
     # Adicionar turma
     with st.expander("Adicionar Turma"):
         with st.form("nova_turma"):
-            nome = st.text_input("Nome da Turma")
-            professor = st.text_input("Professor Responsável")
+            nome_turma = st.text_input("Nome da Turma")
+            id_professor = st.number_input("ID do Professor", min_value=1, value=1)
             horario = st.text_input("Horário")
             
             if st.form_submit_button("Adicionar"):
@@ -200,8 +198,8 @@ def turmas_page():
                     response = requests.post(
                         f"{API_URL}/turmas", 
                         json={
-                            "nome": nome,
-                            "professor_responsavel": professor,
+                            "nome_turma": nome_turma,
+                            "id_professor": id_professor,
                             "horario": horario
                         },
                         headers=headers

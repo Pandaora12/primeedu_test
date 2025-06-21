@@ -8,9 +8,9 @@ turmas_bp = Blueprint('turmas', __name__)
 def adicionar_turma():
     data = request.get_json()
     nova_turma = Turma(
-        nome=data['nome'],
-        professor_responsavel=data['professor_responsavel'],
-        horario=data['horario']
+        nome_turma=data['nome_turma'],
+        id_professor=data.get('id_professor'),
+        horario=data.get('horario')
     )
     db.session.add(nova_turma)
     db.session.commit()
@@ -37,9 +37,9 @@ def atualizar_turma(id):
     if not turma:
         return jsonify({"message": "Turma não encontrada!"}), 404
     data = request.get_json()
-    turma.nome = data['nome']
-    turma.professor_responsavel = data['professor_responsavel']
-    turma.horario = data['horario']
+    turma.nome_turma = data['nome_turma']
+    turma.id_professor = data.get('id_professor')
+    turma.horario = data.get('horario')
     db.session.commit()
     return jsonify({"message": "Turma atualizada com sucesso!"})
 

@@ -6,39 +6,37 @@ db = SQLAlchemy()
 
 class Usuario(db.Model):
     id_usuario = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    senha_hash = db.Column(db.String(200), nullable=False)
-    tipo = db.Column(db.String(20), nullable=False)  # 'admin', 'secretaria', 'professor'
-    data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
+    login = db.Column(db.String(50), unique=True, nullable=False)
+    senha = db.Column(db.String(255), nullable=False)
+    nivel_acesso = db.Column(db.String(20))
+    id_professor = db.Column(db.Integer)
     
     def set_senha(self, senha):
-        self.senha_hash = generate_password_hash(senha)
+        self.senha = generate_password_hash(senha)
         
     def verificar_senha(self, senha):
-        return check_password_hash(self.senha_hash, senha)
+        return check_password_hash(self.senha, senha)
     
     def as_dict(self):
         return {
             'id_usuario': self.id_usuario,
-            'nome': self.nome,
-            'email': self.email,
-            'tipo': self.tipo,
-            'data_criacao': self.data_criacao
+            'login': self.login,
+            'nivel_acesso': self.nivel_acesso,
+            'id_professor': self.id_professor
         }
 
 class Turma(db.Model):
     id_turma = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100), nullable=False)
-    professor_responsavel = db.Column(db.String(100), nullable=False)
-    horario = db.Column(db.String(100), nullable=False)
+    nome_turma = db.Column(db.String(50), nullable=False)
+    id_professor = db.Column(db.Integer)
+    horario = db.Column(db.String(100))
     alunos = db.relationship('Aluno', backref='turma', lazy=True)
     
     def as_dict(self):
         return {
             'id_turma': self.id_turma,
-            'nome': self.nome,
-            'professor_responsavel': self.professor_responsavel,
+            'nome_turma': self.nome_turma,
+            'id_professor': self.id_professor,
             'horario': self.horario
         }
 
@@ -75,8 +73,8 @@ class Pagamento(db.Model):
         return {
             'id_pagamento': self.id_pagamento,
             'id_aluno': self.id_aluno,
-            'data_pagamento': self.data_pagamento,
-            'valor_pago': self.valor_pago,
+            'data_pagamento': self.data_pagamento.isoformat() if self.data_pagamento else None,
+            'valor_pago': float(self.valor_pago) if self.valor_pago else None,
             'forma_pagamento': self.forma_pagamento,
             'referencia': self.referencia,
             'status': self.status
@@ -92,7 +90,7 @@ class Presenca(db.Model):
         return {
             'id_presenca': self.id_presenca,
             'id_aluno': self.id_aluno,
-            'data_presenca': self.data_presenca,
+            'data_presenca': self.data_presenca.isoformat() if self.data_presenca else None,
             'presente': self.presente
         }
 
@@ -105,7 +103,7 @@ class Atividade(db.Model):
         return {
             'id_atividade': self.id_atividade,
             'descricao': self.descricao,
-            'data_realizacao': self.data_realizacao
+            'data_realizacao': self.data_realizacao.isoformat() if self.data_realizacao else None
         }
 
 class Atividade_Aluno(db.Model):

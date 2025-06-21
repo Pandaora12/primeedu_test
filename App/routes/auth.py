@@ -16,7 +16,7 @@ def gerar_token(usuario_id):
     }
     return jwt.encode(
         payload,
-        os.environ.get('SECRET_KEY', 'chave-secreta-temporaria'),
+        'minha-chave-secreta-123',
         algorithm='HS256'
     )
 
@@ -34,7 +34,7 @@ def token_required(f):
         try:
             data = jwt.decode(
                 token, 
-                os.environ.get('SECRET_KEY', 'chave-secreta-temporaria'),
+                'minha-chave-secreta-123',
                 algorithms=['HS256']
             )
             usuario_atual = Usuario.query.get(data['sub'])
@@ -46,18 +46,18 @@ def token_required(f):
     return decorated
 
 # Registrar um novo usuário
-@auth_bp.route('/registrar', methods=['POST'])
+@auth_bp.route('/register', methods=['POST'])
 def registrar():
     data = request.get_json()
     
-    # Verificar se o email já existe
-    if Usuario.query.filter_by(email=data['email']).first():
-        return jsonify({'message': 'Email já cadastrado!'}), 400
+    # Verificar se o login já existe
+    if Usuario.query.filter_by(login=data['login']).first():
+        return jsonify({'message': 'Login já cadastrado!'}), 400
     
     novo_usuario = Usuario(
-        nome=data['nome'],
-        email=data['email'],
-        tipo=data['tipo']
+        login=data['login'],
+        nivel_acesso=data.get('nivel_acesso', 'usuario'),
+        id_professor=data.get('id_professor')
     )
     novo_usuario.set_senha(data['senha'])
     
@@ -71,10 +71,10 @@ def registrar():
 def login():
     data = request.get_json()
     
-    usuario = Usuario.query.filter_by(email=data['email']).first()
+    usuario = Usuario.query.filter_by(login=data['login']).first()
     
     if not usuario or not usuario.verificar_senha(data['senha']):
-        return jsonify({'message': 'Email ou senha incorretos!'}), 401
+        return jsonify({'message': 'Login ou senha incorretos!'}), 401
     
     token = gerar_token(usuario.id_usuario)
     

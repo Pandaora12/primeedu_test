@@ -2,10 +2,6 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from src.models import db
 import os
-from dotenv import load_dotenv
-
-# Carregar variáveis de ambiente
-load_dotenv()
 
 def create_app():
     app = Flask(__name__)
@@ -13,10 +9,10 @@ def create_app():
     # Habilitar CORS
     CORS(app)
     
-    # Configuração do Banco de Dados SQLite (para desenvolvimento)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///primeEdu.db'
+    # Configuração do Banco de Dados
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:admin@db:5432/primeEdu'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chave-secreta-temporaria')
+    app.config['SECRET_KEY'] = 'minha-chave-secreta-123'
     
     # Inicializa o banco de dados com o app
     db.init_app(app)
@@ -50,4 +46,4 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

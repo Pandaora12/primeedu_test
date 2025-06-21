@@ -5,6 +5,7 @@ from routes.atividades import atividades_bp
 from routes.turmas import turmas_bp
 from routes.auth import auth_bp
 from routes.chatbot import chatbot_bp
+from routes.relatorios import relatorios_bp
 
 def register_blueprints(app):
     app.register_blueprint(alunos_bp)
@@ -14,3 +15,4 @@ def register_blueprints(app):
     app.register_blueprint(turmas_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(chatbot_bp)
+    app.register_blueprint(relatorios_bp)

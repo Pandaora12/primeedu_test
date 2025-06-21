@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: primeEdu-api
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://admin:admin@db:5432/primeEdu
+      - SECRET_KEY=sua-chave-secreta-aqui
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    restart: always
+
+  db:
+    image: postgres:13
+    container_name: primeEdu-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../BD/db_primeEdu.sql:/docker-entrypoint-initdb.d/db_primeEdu.sql
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: primeEdu
+    restart: always
+
+volumes:
+  postgres_data:

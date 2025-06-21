@@ -17,12 +17,13 @@ def adicionar_atividade(usuario_atual):
     db.session.add(nova_atividade)
     db.session.commit()
 
-    # Associar alunos à atividade
-    for aluno_id in data['id_alunos']:
-        atividade_aluno = Atividade_Aluno(id_atividade=nova_atividade.id_atividade, id_aluno=aluno_id)
-        db.session.add(atividade_aluno)
-
-    db.session.commit()
+    # Associar alunos à atividade (opcional)
+    if 'id_alunos' in data:
+        for aluno_id in data['id_alunos']:
+            atividade_aluno = Atividade_Aluno(id_atividade=nova_atividade.id_atividade, id_aluno=aluno_id)
+            db.session.add(atividade_aluno)
+        db.session.commit()
+    
     return jsonify({"message": "Atividade registrada com sucesso!"}), 201
 
 # Listar atividades

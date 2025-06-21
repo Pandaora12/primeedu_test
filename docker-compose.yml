@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # Banco de Dados PostgreSQL
+  db:
+    build: ./BD
+    container_name: primeEdu-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: primeEdu
+    restart: always
+    networks:
+      - primeEdu-network
+
+  # API Flask
+  api:
+    build: ./App
+    container_name: primeEdu-api
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    restart: always
+    networks:
+      - primeEdu-network
+
+  # Prometheus para coleta de métricas
+  prometheus:
+    build: ./Observabilidade/prometheus
+    container_name: primeEdu-prometheus
+    ports:
+      - "9090:9090"
+    restart: always
+    networks:
+      - primeEdu-network
+
+  # Grafana para visualização
+  grafana:
+    build: ./Observabilidade/Grafana
+    container_name: primeEdu-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    restart: always
+    networks:
+      - primeEdu-network
+
+  # PostgreSQL Exporter para métricas do banco
+  postgres-exporter:
+    build: ./Observabilidade/postgres-exporter
+    container_name: primeEdu-postgres-exporter
+    ports:
+      - "9187:9187"
+    environment:
+      - DATA_SOURCE_NAME=postgresql://admin:admin@db:5432/primeEdu?sslmode=disable
+    depends_on:
+      - db
+    restart: always
+    networks:
+      - primeEdu-network
+
+  # Streamlit Dashboard
+  streamlit:
+    build: ./App
+    container_name: primeEdu-streamlit
+    ports:
+      - "8501:8501"
+    command: streamlit run streamlit_app.py --server.address=0.0.0.0
+    depends_on:
+      - api
+    restart: always
+    networks:
+      - primeEdu-network
+
+volumes:
+  postgres_data:
+
+networks:
+  primeEdu-network:
+    driver: bridge
