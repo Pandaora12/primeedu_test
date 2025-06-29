@@ -1,6 +1,7 @@
 from flask import request, jsonify, Blueprint
 from src.models import db, Aluno, Pagamento, Presenca, Atividade
 from routes.auth import token_required
+from flasgger import swag_from
 from datetime import datetime, timedelta
 
 chatbot_bp = Blueprint('chatbot', __name__)
@@ -8,6 +9,46 @@ chatbot_bp = Blueprint('chatbot', __name__)
 # Endpoint para o chatbot
 @chatbot_bp.route('/chatbot', methods=['POST'])
 def chatbot_query():
+    """
+    Interagir com o ChatBot
+    
+    **URL Completa:** `POST http://localhost:5000/chatbot`
+    **Para Insomnia/Postman:** Copie a URL acima
+    ---
+    tags:
+      - ChatBot
+    parameters:
+      - in: body
+        name: query
+        description: Pergunta para o ChatBot
+        required: true
+        schema:
+          type: object
+          required:
+            - query
+          properties:
+            query:
+              type: string
+              example: "Qual o valor da mensalidade?"
+            user_id:
+              type: integer
+              example: 1
+              description: ID do usuário para respostas personalizadas
+    responses:
+      200:
+        description: Resposta do ChatBot
+        schema:
+          type: object
+          properties:
+            response:
+              type: string
+              example: "O valor das mensalidades varia de acordo com o plano escolhido."
+            timestamp:
+              type: string
+              format: date-time
+      400:
+        description: Consulta não fornecida
+    """
     data = request.get_json()
     
     if not data or 'query' not in data:

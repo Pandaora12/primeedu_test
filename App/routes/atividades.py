@@ -1,6 +1,7 @@
 from flask import request, jsonify, Blueprint
 from src.models import db, Atividade, Aluno, Atividade_Aluno, Atividade_Turma, Turma
 from routes.auth import token_required
+from flasgger import swag_from
 from datetime import datetime
 
 atividades_bp = Blueprint('atividades', __name__)
@@ -9,6 +10,42 @@ atividades_bp = Blueprint('atividades', __name__)
 @atividades_bp.route('/atividades', methods=['POST'])
 @token_required
 def adicionar_atividade(usuario_atual):
+    """
+    Adicionar uma nova atividade
+    ---
+    tags:
+      - Atividades
+    security:
+      - Bearer: []
+    parameters:
+      - in: body
+        name: atividade
+        description: Dados da atividade
+        required: true
+        schema:
+          type: object
+          required:
+            - descricao
+            - data_realizacao
+          properties:
+            descricao:
+              type: string
+              example: "Prova de Matemática - Capítulo 1"
+            data_realizacao:
+              type: string
+              format: date
+              example: "2024-01-20"
+            id_alunos:
+              type: array
+              items:
+                type: integer
+              example: [1, 2, 3]
+    responses:
+      201:
+        description: Atividade registrada com sucesso
+      401:
+        description: Token não fornecido ou inválido
+    """
     data = request.get_json()
     nova_atividade = Atividade(
         descricao=data['descricao'],
@@ -30,6 +67,30 @@ def adicionar_atividade(usuario_atual):
 @atividades_bp.route('/atividades', methods=['GET'])
 @token_required
 def listar_atividades(usuario_atual):
+    """
+    Listar todas as atividades
+    ---
+    tags:
+      - Atividades
+    security:
+      - Bearer: []
+    responses:
+      200:
+        description: Lista de atividades
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              id_atividade:
+                type: integer
+              descricao:
+                type: string
+              data_realizacao:
+                type: string
+      401:
+        description: Token não fornecido ou inválido
+    """
     atividades = Atividade.query.all()
     return jsonify([atividade.as_dict() for atividade in atividades])
 

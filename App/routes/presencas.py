@@ -1,6 +1,7 @@
 from flask import request, jsonify, Blueprint
 from src.models import db, Presenca, Aluno
 from routes.auth import token_required
+from flasgger import swag_from
 from datetime import datetime, timedelta
 
 presencas_bp = Blueprint('presencas', __name__)
@@ -9,6 +10,43 @@ presencas_bp = Blueprint('presencas', __name__)
 @presencas_bp.route('/presencas', methods=['POST'])
 @token_required
 def registrar_presenca(usuario_atual):
+    """
+    Registrar presença de um aluno
+    ---
+    tags:
+      - Presenças
+    security:
+      - Bearer: []
+    parameters:
+      - in: body
+        name: presenca
+        description: Dados da presença
+        required: true
+        schema:
+          type: object
+          required:
+            - id_aluno
+            - data_presenca
+            - presente
+          properties:
+            id_aluno:
+              type: integer
+              example: 1
+            data_presenca:
+              type: string
+              format: date
+              example: "2024-01-15"
+            presente:
+              type: boolean
+              example: true
+    responses:
+      201:
+        description: Presença registrada com sucesso
+      404:
+        description: Aluno não encontrado
+      401:
+        description: Token não fornecido ou inválido
+    """
     data = request.get_json()
     aluno = Aluno.query.get(data['id_aluno'])
     if not aluno:
@@ -26,6 +64,32 @@ def registrar_presenca(usuario_atual):
 @presencas_bp.route('/presencas', methods=['GET'])
 @token_required
 def listar_presencas(usuario_atual):
+    """
+    Listar todas as presenças
+    ---
+    tags:
+      - Presenças
+    security:
+      - Bearer: []
+    responses:
+      200:
+        description: Lista de presenças
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              id_presenca:
+                type: integer
+              id_aluno:
+                type: integer
+              data_presenca:
+                type: string
+              presente:
+                type: boolean
+      401:
+        description: Token não fornecido ou inválido
+    """
     presencas = Presenca.query.all()
     return jsonify([presenca.as_dict() for presenca in presencas])
 
@@ -33,6 +97,27 @@ def listar_presencas(usuario_atual):
 @presencas_bp.route('/presencas/<int:id>', methods=['GET'])
 @token_required
 def consultar_presenca(usuario_atual, id):
+    """
+    Consultar presenças de um aluno
+    ---
+    tags:
+      - Presenças
+    security:
+      - Bearer: []
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+        description: ID do aluno
+    responses:
+      200:
+        description: Lista de presenças do aluno
+      404:
+        description: Nenhuma presença encontrada
+      401:
+        description: Token não fornecido ou inválido
+    """
     presencas = Presenca.query.filter_by(id_aluno=id).all()
     if presencas:
         return jsonify([presenca.as_dict() for presenca in presencas])

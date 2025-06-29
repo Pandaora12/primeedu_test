@@ -1,6 +1,7 @@
 from flask import request, jsonify, Blueprint
 from src.models import db, Aluno, Pagamento, Presenca, Atividade, Turma
 from routes.auth import token_required
+from flasgger import swag_from
 from datetime import datetime, timedelta
 from sqlalchemy import func, and_
 
@@ -10,6 +11,50 @@ relatorios_bp = Blueprint('relatorios', __name__)
 @relatorios_bp.route('/relatorios/pagamentos', methods=['GET'])
 @token_required
 def relatorio_pagamentos(usuario_atual):
+    """
+    Gerar relatório de pagamentos por período
+    ---
+    tags:
+      - Relatórios
+    security:
+      - Bearer: []
+    parameters:
+      - in: query
+        name: data_inicio
+        type: string
+        format: date
+        required: true
+        description: Data de início (YYYY-MM-DD)
+        example: "2024-01-01"
+      - in: query
+        name: data_fim
+        type: string
+        format: date
+        required: true
+        description: Data de fim (YYYY-MM-DD)
+        example: "2024-01-31"
+      - in: query
+        name: status
+        type: string
+        enum: ["pago", "pendente"]
+        description: Filtrar por status
+    responses:
+      200:
+        description: Relatório de pagamentos
+        schema:
+          type: object
+          properties:
+            periodo:
+              type: object
+            resumo:
+              type: object
+            pagamentos:
+              type: array
+      400:
+        description: Parâmetros inválidos
+      401:
+        description: Token não fornecido ou inválido
+    """
     data_inicio = request.args.get('data_inicio')
     data_fim = request.args.get('data_fim')
     status = request.args.get('status')  # 'pago', 'pendente'
@@ -56,6 +101,30 @@ def relatorio_pagamentos(usuario_atual):
 @relatorios_bp.route('/relatorios/inadimplencia', methods=['GET'])
 @token_required
 def relatorio_inadimplencia(usuario_atual):
+    """
+    Gerar relatório de inadimplência
+    ---
+    tags:
+      - Relatórios
+    security:
+      - Bearer: []
+    responses:
+      200:
+        description: Relatório de inadimplência
+        schema:
+          type: object
+          properties:
+            data_consulta:
+              type: string
+            total_inadimplentes:
+              type: integer
+            valor_total_devido:
+              type: number
+            inadimplentes:
+              type: array
+      401:
+        description: Token não fornecido ou inválido
+    """
     hoje = datetime.now().date()
     
     # Pagamentos vencidos (pendentes e com data anterior a hoje)

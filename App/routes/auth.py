@@ -3,6 +3,7 @@ from src.models import db, Usuario
 import jwt
 from datetime import datetime, timedelta
 from functools import wraps
+from flasgger import swag_from
 import os
 
 auth_bp = Blueprint('auth', __name__)
@@ -48,6 +49,41 @@ def token_required(f):
 # Registrar um novo usuário
 @auth_bp.route('/register', methods=['POST'])
 def registrar():
+    """
+    Registrar novo usuário
+    ---
+    tags:
+      - Autenticação
+    parameters:
+      - in: body
+        name: user
+        description: Dados do novo usuário
+        required: true
+        schema:
+          type: object
+          required:
+            - login
+            - senha
+          properties:
+            login:
+              type: string
+              example: "admin"
+            senha:
+              type: string
+              example: "123456"
+            nivel_acesso:
+              type: string
+              example: "admin"
+              enum: ["admin", "secretaria", "professor"]
+            id_professor:
+              type: integer
+              example: 1
+    responses:
+      201:
+        description: Usuário registrado com sucesso
+      400:
+        description: Login já existe ou dados inválidos
+    """
     data = request.get_json()
     
     # Verificar se o login já existe
@@ -69,6 +105,52 @@ def registrar():
 # Login
 @auth_bp.route('/login', methods=['POST'])
 def login():
+    """
+    Fazer login no sistema
+    
+    **URL Completa:** `POST http://localhost:5000/login`
+    **Para Insomnia/Postman:** Copie a URL acima
+    ---
+    tags:
+      - Autenticação
+    parameters:
+      - in: body
+        name: credentials
+        description: Credenciais de login
+        required: true
+        schema:
+          type: object
+          required:
+            - login
+            - senha
+          properties:
+            login:
+              type: string
+              example: "admin"
+            senha:
+              type: string
+              example: "123456"
+    responses:
+      200:
+        description: Login realizado com sucesso
+        schema:
+          type: object
+          properties:
+            token:
+              type: string
+              description: JWT token para autenticação
+            usuario:
+              type: object
+              properties:
+                id_usuario:
+                  type: integer
+                login:
+                  type: string
+                nivel_acesso:
+                  type: string
+      401:
+        description: Credenciais inválidas
+    """
     data = request.get_json()
     
     usuario = Usuario.query.filter_by(login=data['login']).first()
