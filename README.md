@@ -35,11 +35,6 @@ Sistema completo para gerenciamento de escola infantil com controle de alunos, t
 - Associação com alunos específicos
 - Relatórios de atividades realizadas
 
-### 🤖 ChatBot Inteligente
-- Suporte automatizado 24/7
-- Consultas sobre pagamentos, presenças e atividades
-- Respostas personalizadas por usuário
-
 ### 📊 Relatórios Gerenciais
 - Relatórios financeiros detalhados
 - Análise de frequência dos alunos
@@ -116,13 +111,7 @@ docker-compose ps
 
 ## 📱 Como Usar
 
-### 1. Primeiro Acesso
-1. Acesse http://localhost:8501
-2. Clique em "Registrar nova conta"
-3. Preencha os dados e selecione nível de acesso
-4. Faça login com suas credenciais
-
-### 2. Navegação
+### 1. Navegação
 - Use o menu lateral para navegar entre módulos
 - **Dashboard**: Visão geral do sistema
 - **Alunos**: Gerenciar cadastro de alunos
@@ -130,36 +119,11 @@ docker-compose ps
 - **Pagamentos**: Controle financeiro
 - **Presenças**: Registro de frequência
 - **Atividades**: Atividades pedagógicas
-- **ChatBot**: Suporte automatizado
 
-### 3. API REST
+### 2. API REST
 - Documentação completa: http://localhost:5000/swagger/
 - Todas as rotas documentadas com exemplos
-- Autenticação via JWT token
 - Suporte a Postman/Insomnia
-
-## 🔐 Autenticação
-
-### Login via Interface Web
-```
-1. Acesse http://localhost:8501
-2. Digite login e senha
-3. Sistema retorna token JWT
-4. Token válido por 24 horas
-```
-
-### Login via API
-```bash
-curl -X POST http://localhost:5000/login \
-  -H "Content-Type: application/json" \
-  -d '{"login": "admin", "senha": "123456"}'
-```
-
-### Usando Token em Requisições
-```bash
-curl -X GET http://localhost:5000/alunos \
-  -H "Authorization: Bearer SEU_TOKEN_AQUI"
-```
 
 ## 📊 Monitoramento
 
@@ -233,10 +197,6 @@ docker-compose logs -f
 
 ### Endpoints Principais
 
-#### Autenticação
-- `POST /login` - Fazer login
-- `POST /register` - Registrar usuário
-
 #### Alunos
 - `GET /alunos` - Listar alunos
 - `POST /alunos` - Adicionar aluno
@@ -248,9 +208,6 @@ docker-compose logs -f
 - `GET /pagamentos` - Listar pagamentos
 - `POST /pagamentos` - Registrar pagamento
 - `GET /relatorios/inadimplencia` - Relatório de inadimplência
-
-#### ChatBot
-- `POST /chatbot` - Interagir com ChatBot
 
 ### Exemplos de Uso
 
@@ -266,16 +223,6 @@ curl -X POST http://localhost:5000/alunos \
     "nome_responsavel": "Maria Silva",
     "telefone_responsavel": "(11) 99999-9999",
     "email_responsavel": "maria.silva@email.com"
-  }'
-```
-
-#### Consultar ChatBot
-```bash
-curl -X POST http://localhost:5000/chatbot \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "Qual o valor da mensalidade?",
-    "user_id": 1
   }'
 ```
 
@@ -356,15 +303,6 @@ docker-compose logs api
 - Métricas de performance via Prometheus
 - Dashboards de monitoramento no Grafana
 - Logs estruturados para análise
-
-## 🤝 Contribuição
-
-### Como Contribuir
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
-3. Commit suas mudanças (`git commit -am 'Adiciona nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abra um Pull Request
 
 ### Padrões de Código
 - Seguir PEP 8 para Python
