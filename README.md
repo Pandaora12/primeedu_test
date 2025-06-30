@@ -141,6 +141,9 @@ docker-compose ps
 
 ## 🗄️ Banco de Dados
 
+![image](https://github.com/user-attachments/assets/1933c69c-f9ea-4e45-b6ce-64c00ff49cfb)
+
+
 ### Schema Principal
 ```sql
 -- Principais tabelas
